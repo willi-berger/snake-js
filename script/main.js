@@ -10,9 +10,10 @@ const snakeGame = function (canvas) {
     const height = ctx.canvas.height;
     const cellWidth = width/nCols;
     const cellHeight = height/nRows;
+    var score = 0;
 
     
-    var timeStepMs = 500;
+    var timeStepMs = 400;
 
     function Snake(x, y) {
         this.x = x
@@ -61,12 +62,18 @@ const snakeGame = function (canvas) {
 
         this.eat = function() {
             this.tail.push({x: this.x, y: this.y});
+            updateScore(++score);
             console.debug( `eat: ${this.tail.length}:`, this.tail);
         }
 
         this.stroke = function () {
             //console.debug(`snake.stroke x: ${this.x}, y: ${this.y}`);
-            for (let i = 0; i < this.tail.length; i++) {
+            // ToDo: make snake "thinner" than cell width height .. 
+/*             let w = cellWidth * 0.8
+            let h = cellHeight * 0.8
+            let offx = (cellHeight - h) / 2
+            let offy = (cellWidth - w) / 2
+ */            for (let i = 0; i < this.tail.length; i++) {
                 ctx.save();
                 ctx.translate(this.tail[i].x * cellWidth, this.tail[i].y * cellHeight);
                 ctx.fillStyle = 'black';
@@ -93,9 +100,13 @@ const snakeGame = function (canvas) {
         }
     }
 
-    this.placeFood = function() {
-        // ToDo Food must not be on/under snake
-        return new Food(Math.floor(Math.random() * nCols), Math.floor(Math.random() * nRows));
+    this.placeFood = function(occupied) {
+        // Food must not be on/under snake
+        do {
+            var cell ={x: Math.floor(Math.random() * nCols), y: Math.floor(Math.random() * nRows)};
+        } while (occupied.some(elem => elem.x === cell.x && elem.y === cell.y))
+
+        return new Food(cell.x, cell.y);
     }
 
     function updateAll() {
@@ -104,7 +115,7 @@ const snakeGame = function (canvas) {
         if (snake.canWalk()) {
             if (snake.x === food.x && snake.y === food.y) {
                 snake.eat();
-                food = this.placeFood();
+                food = this.placeFood(snake.tail);
                 food.stroke();
             }
             snake.walk()
@@ -149,10 +160,15 @@ const snakeGame = function (canvas) {
     snake.dir = Direction.right;
 
     // Init food
-    var food = this.placeFood();
+    var food = this.placeFood(snake.tail);
 
     // Do the first update
     updateAll();
+}
+
+
+function updateScore(score) {
+    document.getElementById("score").innerHTML = score;
 }
 
 
