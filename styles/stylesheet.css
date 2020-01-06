@@ -4,3 +4,7 @@
 /*     width: 400px;  if width height is defined here the canvas content is blurry ? 
     height: 400.4px;
  */}
+
+ #score, #speed {
+     font-weight: bold;
+ }

@@ -12,8 +12,8 @@ const snakeGame = function (canvas) {
     const cellHeight = height/nRows;
     var score = 0;
 
-    
-    var timeStepMs = 400;
+    var  timeStepMsDefault = 500;
+    var timeStepMs = 500;
 
     function Snake(x, y) {
         this.x = x
@@ -73,10 +73,12 @@ const snakeGame = function (canvas) {
             let h = cellHeight * 0.8
             let offx = (cellHeight - h) / 2
             let offy = (cellWidth - w) / 2
- */            for (let i = 0; i < this.tail.length; i++) {
+ */            
+            let len = this.tail.length;
+            for (let i = 0; i < this.tail.length; i++) {
                 ctx.save();
                 ctx.translate(this.tail[i].x * cellWidth, this.tail[i].y * cellHeight);
-                ctx.fillStyle = 'black';
+                ctx.fillStyle = `rgb(${125*(i/(len-1))}, ${125*(i/(len-1))}, ${125*(i/(len-1))})`;
                 ctx.fillRect(0, 0, cellWidth, cellHeight);
                 ctx.restore();
             }
@@ -127,27 +129,69 @@ const snakeGame = function (canvas) {
         snake.stroke();
     }
 
+    this.speedUp = function () {
+        if (timeStepMs > 100) {
+            this.changeSpeed(timeStepMs - 100);
+        }
+    }
+
+    this.speedDown = function () {
+        if (timeStepMs < 1000) {
+            this.changeSpeed(timeStepMs + 100);
+        }
+    }
+
+    this.speedReset = function () {
+        this.changeSpeed(timeStepMsDefault);
+    }
+
+    this.changeSpeed = function(val) {
+        timeStepMs = val;
+        document.getElementById("speed").innerHTML = timeStepMs;
+        console.debug(`changed timeStep = ${timeStepMs}`);
+    }
+
     this.onKeyDown = function (e) {
         console.log(`onKeyDown(${e.code})`)
         switch (e.code) {
             case 'ArrowUp':
-                if (snake.dy !== 1) {
-                    snake.dir = Direction.up;               
+                if (snake.dir == Direction.up) {
+                    this.speedUp();
+                } else if (snake.dir == Direction.down) {
+                    this.speedDown()
+                } else if (snake.dy !== 1) {
+                    snake.dir = Direction.up;
+                    this.speedReset();             
                 }
                 break;
             case 'ArrowDown':
-                if (snake.dy !== -1) {                    
+                if (snake.dir == Direction.down) {
+                    this.speedUp();
+                } else if (snake.dir == Direction.up) {
+                    this.speedDown()
+                } else if (snake.dy !== -1) {                    
                     snake.dir = Direction.down;               
+                    this.speedReset();             
                 }
                 break;
             case 'ArrowLeft':
-                if (snake.dx !== 1) {                    
+                if (snake.dir == Direction.left) {
+                    this.speedUp();
+                } else if (snake.dir == Direction.right) {
+                    this.speedDown()
+                } else  if (snake.dx !== 1) {                    
                     snake.dir = Direction.left;               
+                    this.speedReset();             
                 }
                 break;
             case 'ArrowRight':
-                if (snake.dx !== -1) {                    
+                if (snake.dir == Direction.right) {
+                    this.speedUp();
+                } else if (snake.dir == Direction.left) {
+                    this.speedDown()
+                } else if (snake.dx !== -1) {                    
                     snake.dir = Direction.right;               
+                    this.speedReset();             
                 }
                 break;
         }
