@@ -150,15 +150,14 @@ const snakeGame = function (canvas) {
 
     // Init food
     var food = this.placeFood();
-    // food = new Food(19,14)
 
     // Do the first update
     updateAll();
 }
 
 
-$(document).ready(function () {
-    console.log('document ready')
-    var canvas = $("#canvas")[0]
+document.onreadystatechange = function () {
+    console.debug('document ready')
+    var canvas = document.getElementById("canvas")
     snakeGame(canvas);
-})
+}
