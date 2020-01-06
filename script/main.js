@@ -157,7 +157,9 @@ const snakeGame = function (canvas) {
 
 
 document.onreadystatechange = function () {
-    console.debug('document ready')
-    var canvas = document.getElementById("canvas")
-    snakeGame(canvas);
+    if (document.readyState === 'complete') {
+        console.debug('document ready')
+        var canvas = document.getElementById("canvas")
+        snakeGame(canvas)
+    }
 }
