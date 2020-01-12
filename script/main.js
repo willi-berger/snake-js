@@ -1,7 +1,7 @@
 /**
  * snake game
  */
-// TODO  'use strict'
+// TODO 'use strict'
 const Direction = {left: 0, up: 1, right: 2, down: 3};
 
 const FoodType = {
@@ -19,8 +19,8 @@ function snakeGame (canvas) {
     const cellWidth = width/nCols;
     const cellHeight = height/nRows;
     const timeStepMsDefault = 400;  // ATT inititially hard coded in index.html
-    const MoveFoodInterval = 4000;
-    const DisappearFoodInterval =8000;
+    const MOVE_FOOD_MS = 4000;
+    const DISAPPEAR_FOOD_MS =8000;
     
     var score = 0;
     var foods = [];
@@ -74,7 +74,6 @@ function snakeGame (canvas) {
         this.eat = function(food) {
             // ToDo grow depending on food type
             this.tail.push({x: this.x, y: this.y});
-            updateScore(score += food.type.score);
             console.debug( `eat: ${this.tail.length}:`, this.tail);
         }
 
@@ -101,22 +100,9 @@ function snakeGame (canvas) {
         this.x = x;
         this.y = y;
         this.type = type;
+        this.timer = 0;
+        this.moves = 0;
         console.log("new food:", this);
-
-        var timer;
-        this.cleanUp = function () {
-            if (timer) {
-                clearTimeout(timer);
-            }
-        }
-
-        this.move = function(self) {
-            let newPlace = this.randomFreeCell();
-            console.debug("move food to new place ", newPlace);
-            self.x = newPlace.x;
-            self.y = newPlace.y;
-            timer = setTimeout(self.move, MoveFoodInterval, self);
-        }
 
         this.stroke = function () {
             //console.debug(`food.stroke x: ${this.x}, y: ${this.y}`);
@@ -140,34 +126,62 @@ function snakeGame (canvas) {
         return cell;
     }
 
-    this.placeFood = function() {
+    this.placeFood = function(type) {
         // Food must not be on/under snake
         let cell = this.randomFreeCell();
-        let dice = Math.floor(Math.random() * 10);
-        type = dice <= 5 ? FoodType.regular : dice <= 7 ? FoodType.moving : FoodType.disappear;
-
+        if (undefined == type) {
+            let dice = Math.floor(Math.random() * 10);
+            type = dice <= 5 ? FoodType.regular : dice <= 7 ? FoodType.moving : FoodType.disappear;
+        }
         let food = new Food(cell.x, cell.y, type);       
         if (food.type === FoodType.moving) {
-            timer = setTimeout(food.move, MoveFoodInterval, food);
-        } else if (food.type === FoodType.disappear) {  // ToDo cleanup timer if food is eaten before
-            setTimeout(this.removeFood, DisappearFoodInterval, this, food);
+            food.timer = setTimeout(this.moveFood, MOVE_FOOD_MS, this, food);
+        } else if (food.type === FoodType.disappear) {
+            food.timer = setTimeout(this.removeFood, DISAPPEAR_FOOD_MS, this, food);
         }
         return food;
     }
 
+    this.moveFood = function(self, food) {
+        if (food.moves++ < 4) {
+            let newPlace = self.randomFreeCell();
+            console.debug("move food to new place ", newPlace);
+            food.x = newPlace.x;
+            food.y = newPlace.y;
+            timer = setTimeout(self.moveFood, MOVE_FOOD_MS, self, food);
+        } else {
+            console.debug('missed ', food.type)
+            updateScore(score -= food.type.score);
+            self.removeFood(self, food);
+        }
+    }
+
     this.removeFood = function (self, food) {
-        console.debug("remove food ", food)
+        console.debug("remove food ", food.type)
         foods = foods.filter(f => f.x != food.x && f.y != food.y);
     }
 
+    /**
+     * updateAll: game main loop
+     */
     function updateAll() {
+        console.debug("update all")
         ctx.clearRect(0, 0, width, height);
 
         if (snake.canWalk()) {
             let foundFood = foods.find(f => f.x === snake.x && f.y === snake.y);
             if (foundFood) {
                 snake.eat(foundFood);
-                foundFood.cleanUp();
+                if (foundFood.timer) {
+                    clearTimeout(foundFood.timer);
+                }
+                if (FoodType.disappear === foundFood.type) {
+                    for (let i = 0; i < 10; i++) {
+                        foods.push(this.placeFood(FoodType.regular));
+                    }
+                }
+                updateScore(score += foundFood.type.score);
+                // ToDo refactor use removeFood()
                 foods = foods.filter(f => f.x != foundFood.x && f.y != foundFood.y);
             }
             snake.walk()
@@ -205,7 +219,7 @@ function snakeGame (canvas) {
     }
 
     this.onKeyDown = function (e) {
-        console.log(`onKeyDown(${e.code})`)
+        console.log(`onKeyDown(${e.code}) `, this);
         switch (e.code) {
             case 'ArrowUp':
                 if (snake.dir == Direction.up) {
@@ -250,6 +264,7 @@ function snakeGame (canvas) {
         }
     }
 
+    // setup event listeners
     window.addEventListener('keydown', this.onKeyDown);
 
     // Init snake
@@ -270,6 +285,7 @@ function updateScore(score) {
 
 function startGame() {
     var canvas = document.getElementById("canvas");
+    updateScore(0);
     snakeGame(canvas);
 }
 
