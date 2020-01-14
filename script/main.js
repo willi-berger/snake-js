@@ -182,7 +182,7 @@ function snakeGame (canvas) {
                 }
                 updateScore(score += foundFood.type.score);
                 // ToDo refactor use removeFood()
-                foods = foods.filter(f => f.x != foundFood.x && f.y != foundFood.y);
+                foods = foods.filter(f => {f.x != foundFood.x && f.y != foundFood.y});
             }
             snake.walk()
             let timer = setTimeout(updateAll, timeStepMs);
