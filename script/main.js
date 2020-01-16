@@ -76,21 +76,50 @@ function snakeGame (canvas) {
             this.tail.push({x: this.x, y: this.y});
             console.debug( `eat: ${this.tail.length}:`, this.tail);
         }
+        
+        const w = cellWidth * 0.9;
+        const h = cellHeight * 0.9;
+        const offx = (cellHeight - h) / 2
+        const offy = (cellWidth - w) / 2
 
         this.stroke = function () {
-            //console.debug(`snake.stroke x: ${this.x}, y: ${this.y}`);
+            console.debug(`snake.stroke x: ${this.x}, y: ${this.y}`);
             // ToDo: make snake "thinner" than cell width height .. 
-/*             let w = cellWidth * 0.8
-            let h = cellHeight * 0.8
-            let offx = (cellHeight - h) / 2
-            let offy = (cellWidth - w) / 2
- */            
+             
             let len = this.tail.length;
+            let tail = this.tail;
             for (let i = 0; i < this.tail.length; i++) {
                 ctx.save();
                 ctx.translate(this.tail[i].x * cellWidth, this.tail[i].y * cellHeight);
                 ctx.fillStyle = `rgb(${125*(i/(len-1))}, ${125*(i/(len-1))}, ${125*(i/(len-1))})`;
-                ctx.fillRect(0, 0, cellWidth, cellHeight);
+                ctx.fillRect(offx, offy, w, h);
+                if (i > 0) {
+                    //ctx.fillStyle = 'red'
+                    if (tail[i-1].x > tail[i].x && tail[i-1].y == tail[i].y) {
+                        ctx.fillRect(cellWidth - offx, offy, offx, h);  // right
+                    } else if (tail[i-1].x < tail[i].x && tail[i-1].y == tail[i].y) {
+                        ctx.fillRect(0, offy, offx, h);  // left
+                    } else if (tail[i-1].x == tail[i].x && tail[i-1].y < tail[i].y) {
+                        ctx.fillRect(offx, 0, w, offy);  // above
+                    } else if (tail[i-1].x == tail[i].x && tail[i-1].y > tail[i].y) {
+                        ctx.fillRect(offx, cellHeight - offx, w, offy);  // below
+                    }
+                }
+
+                if (i < this.tail.length -1) {
+                    //ctx.fillStyle = 'green'
+                    if (tail[i].x > tail[i+1].x && tail[i].y == tail[i+1].y) {
+                        ctx.fillRect(0, offy, offx, h);  // left
+                    } else if (tail[i].x < tail[i+1].x && tail[i].y == tail[i+1].y) {
+                        ctx.fillRect(cellWidth - offx, offy, offx, h);  // right
+                    } else if (tail[i].x == tail[i+1].x && tail[i].y < tail[i+1].y) {
+                        ctx.fillRect(offx, cellHeight - offx, w, offy);  // below
+                    } else if (tail[i].x == tail[i+1].x && tail[i].y > tail[i+1].y) {
+                        ctx.fillRect(offx, 0, w, offy);  // above
+                    }
+
+                }
+
                 ctx.restore();
             }
         }
@@ -131,7 +160,7 @@ function snakeGame (canvas) {
         let cell = this.randomFreeCell();
         if (undefined == type) {
             let dice = Math.floor(Math.random() * 10);
-            type = dice <= 5 ? FoodType.regular : dice <= 7 ? FoodType.moving : FoodType.disappear;
+            type = dice <= 5 ? FoodType.regular : dice <= 6 ? FoodType.moving : FoodType.disappear;
         }
         let food = new Food(cell.x, cell.y, type);       
         if (food.type === FoodType.moving) {
