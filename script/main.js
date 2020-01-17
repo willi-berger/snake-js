@@ -6,7 +6,7 @@ const Direction = {left: 0, up: 1, right: 2, down: 3};
 
 const FoodType = {
     regular: {color: 'red', score: 1},      // regular
-    moving: {color: 'yellow', score: 2},    // moves
+    moving: {color: 'yellow', score: 5},    // moves
     disappear: {color: 'green', score:2}    // disappears, if eaten produces 3 red
 };
 
@@ -33,6 +33,7 @@ function snakeGame (canvas) {
         this.dy = 0
         this.dir
         this.tail = [{x: this.x, y: this.y}];
+        this.colorMode = 1;
 
         this.canWalk = function() {
             switch (this.dir) {
@@ -55,8 +56,13 @@ function snakeGame (canvas) {
             }
     
             // detect collision also consider current direction!
-            if (this.x + this.dx < 0 || this.x + this.dx > nCols-1 ||
-                this.y + this.dy < 0 || this.y + this.dy > nRows-1) {
+            let nextx = this.x + this.dx;
+            let nexty = this.y + this.dy;
+            if (nextx < 0 || nextx > nCols-1 ||
+                nexty < 0 || nexty > nRows-1) {
+                return false;
+            }
+            if (this.tail.some((e, i) => i > 2 && e.x == nextx && e.y == nexty)) {
                 return false;
             }
             return true;
@@ -82,16 +88,22 @@ function snakeGame (canvas) {
         const offx = (cellHeight - h) / 2
         const offy = (cellWidth - w) / 2
 
+
+        this.strokeEnd = function () {
+            this.colorMode = 0;
+            this.stroke();
+        }
+
         this.stroke = function () {
-            console.debug(`snake.stroke x: ${this.x}, y: ${this.y}`);
-            // ToDo: make snake "thinner" than cell width height .. 
-             
+            console.debug(`snake.stroke x: ${this.x}, y: ${this.y} - ${this.colorMode}`);             
             let len = this.tail.length;
             let tail = this.tail;
             for (let i = 0; i < this.tail.length; i++) {
                 ctx.save();
                 ctx.translate(this.tail[i].x * cellWidth, this.tail[i].y * cellHeight);
-                ctx.fillStyle = `rgb(${125*(i/(len-1))}, ${125*(i/(len-1))}, ${125*(i/(len-1))})`;
+                ctx.fillStyle = this.colorMode ? 
+                    `rgb(${125*(i/(len-1))}, ${125*(i/(len-1))}, ${125*(i/(len-1))})` : 
+                    `rgb(255, ${200*(i/(len-1))}, ${200*(i/(len-1))})`;
                 ctx.fillRect(offx, offy, w, h);
                 if (i > 0) {
                     //ctx.fillStyle = 'red'
@@ -131,7 +143,7 @@ function snakeGame (canvas) {
         this.type = type;
         this.timer = 0;
         this.moves = 0;
-        console.log("new food:", this);
+        console.debug("new food:", this);
 
         this.stroke = function () {
             //console.debug(`food.stroke x: ${this.x}, y: ${this.y}`);
@@ -139,7 +151,7 @@ function snakeGame (canvas) {
             ctx.translate(this.x * cellWidth, this.y * cellHeight);
             ctx.beginPath();
             ctx.fillStyle = type.color;
-            ctx.arc(cellWidth / 2, cellHeight / 2, Math.min(cellWidth, cellHeight) / 2, 0, 2*Math.PI);
+            ctx.arc(cellWidth / 2, cellHeight / 2, Math.min(cellWidth, cellHeight) * 0.45, 0, 2*Math.PI);
             ctx.fill();
             ctx.restore();
         }
@@ -196,8 +208,9 @@ function snakeGame (canvas) {
     function updateAll() {
         console.debug("update all")
         ctx.clearRect(0, 0, width, height);
-
-        if (snake.canWalk()) {
+        snake.canWalk();
+        let canWalk = snake.canWalk()
+        if (canWalk) {
             let foundFood = foods.find(f => f.x === snake.x && f.y === snake.y);
             if (foundFood) {
                 snake.eat(foundFood);
@@ -215,14 +228,17 @@ function snakeGame (canvas) {
             }
             snake.walk()
             let timer = setTimeout(updateAll, timeStepMs);
+        }
+        if (canWalk){
+            if (foods.length == 0) {
+                foods.push(this.placeFood());
+            }
+            foods.forEach(f => f.stroke());
+            snake.stroke();
         } else {
-            console.log('game over');
+            console.info('game over');
+            snake.strokeEnd();
         }
-        if (foods.length == 0) {
-            foods.push(this.placeFood());
-        }
-        foods.forEach(f => f.stroke());
-        snake.stroke();
     }
 
     this.speedUp = function () {
@@ -313,6 +329,7 @@ function updateScore(score) {
 }
 
 function startGame() {
+    console.info("Start new game");
     var canvas = document.getElementById("canvas");
     updateScore(0);
     snakeGame(canvas);
