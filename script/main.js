@@ -264,7 +264,7 @@ function snakeGame (canvas) {
     }
 
     this.onKeyDown = function (e) {
-        console.log(`onKeyDown(${e.code}) `, this);
+        console.debug(`onKeyDown(${e.code}) `, this);
         switch (e.code) {
             case 'ArrowUp':
                 if (snake.dir == Direction.up) {
@@ -309,8 +309,30 @@ function snakeGame (canvas) {
         }
     }
 
+    this.onMouseClicked = function(e) {
+        let x = (e.x - canvas.offsetLeft) / cellWidth;
+        let y = (e.y - canvas.offsetTop) / cellHeight;
+        console.debug(`onMausClicked ${x} ${y}`); 
+
+        if (snake.dx != 0) {
+            if (y > snake.y) {
+                snake.dir = Direction.down
+            } else {
+                snake.dir = Direction.up;
+            }
+        } else if (snake.dy != 0) {
+            if (x > snake.x) {
+                snake.dir = Direction.right
+            } else {
+                snake.dir = Direction.left;
+            }
+        }
+
+    }
+
     // setup event listeners
     window.addEventListener('keydown', this.onKeyDown);
+    canvas.addEventListener('click', this.onMouseClicked);
 
     // Init snake
     var snake = new Snake(Math.floor(nCols/2), Math.floor(nRows/2));
