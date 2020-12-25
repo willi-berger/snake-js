@@ -95,7 +95,7 @@ function snakeGame (canvas) {
         }
 
         this.stroke = function () {
-            console.debug(`snake.stroke x: ${this.x}, y: ${this.y} - ${this.colorMode}`);             
+            //console.debug(`snake.stroke x: ${this.x}, y: ${this.y} - ${this.colorMode}`);             
             let len = this.tail.length;
             let tail = this.tail;
             for (let i = 0; i < this.tail.length; i++) {
@@ -153,6 +153,9 @@ function snakeGame (canvas) {
             ctx.fillStyle = type.color;
             ctx.arc(cellWidth / 2, cellHeight / 2, Math.min(cellWidth, cellHeight) * 0.45, 0, 2*Math.PI);
             ctx.fill();
+            /* Todo ... ctx.fillStyle = 'black';
+            ctx.font = `${cellHeight*0.8}px serif`;
+            ctx.fillText("1", cellWidth, cellHeight); */
             ctx.restore();
         }
     }
@@ -259,12 +262,21 @@ function snakeGame (canvas) {
 
     this.changeSpeed = function(val) {
         timeStepMs = val;
-        document.getElementById("speed").innerHTML = timeStepMs;
         console.debug(`changed timeStep = ${timeStepMs}`);
+        let sVal = 11 - (timeStepMs/100);
+        $("#speed").html(timeStepMs);
+        for (i = 1; i <= 10; i++) {
+            if (i <= sVal) {
+                $("#s"+(i-1)).addClass('speed-set')
+            } else {
+                $("#s"+(i-1)).removeClass('speed-set')
+            }
+        }
+
     }
 
     this.onKeyDown = function (e) {
-        console.debug(`onKeyDown(${e.code}) `, this);
+        //console.debug(`onKeyDown(${e.code}) `, this);
         switch (e.code) {
             case 'ArrowUp':
                 if (snake.dir == Direction.up) {

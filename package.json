@@ -1,0 +1,13 @@
+{
+  "name": "snake-js",
+  "version": "1.0.0",
+  "description": "Sbake game",
+  "main": "index.html",
+  "repository": "https://github.com/willi-berger/snake-js.git",
+  "author": "Willi Berger <willi.berger@gmx.at>",
+  "license": "MIT",
+  "dependencies": {
+    "jquery": "^3.5.1",
+    "mini.css": "^3.0.1"
+  }
+}

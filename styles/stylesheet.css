@@ -6,3 +6,21 @@
  #score, #speed {
      font-weight: bold;
  }
+
+
+ .speedmeter {
+     display: inline;
+ }
+ .speed {
+     width: 20px;
+     height: 8px;
+     margin-right: 2px;
+     border-width: 1px;
+     border-style: solid;
+     border-color: black;
+     display: inline-block;
+ }
+
+ .speed-set {
+     background-color: black;
+ }
