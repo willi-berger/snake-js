@@ -23,6 +23,9 @@ function snakeGame (canvas) {
     const DISAPPEAR_FOOD_MS =8000;
     
     var score = 0;
+    var nRed = 0;
+    var nGreen = 0;
+    var nYellow = 0;
     var foods = [];
     var timeStepMs = 500;
 
@@ -195,7 +198,7 @@ function snakeGame (canvas) {
             timer = setTimeout(self.moveFood, MOVE_FOOD_MS, self, food);
         } else {
             console.debug('missed ', food.type)
-            updateScore(score -= food.type.score);
+            this.updateScore(score -= food.type.score, food);
             self.removeFood(self, food);
         }
     }
@@ -225,7 +228,7 @@ function snakeGame (canvas) {
                         foods.push(this.placeFood(FoodType.regular));
                     }
                 }
-                updateScore(score += foundFood.type.score);
+                this.updateScore(score += foundFood.type.score, foundFood);
                 // ToDo refactor use removeFood()
                 foods = foods.filter(f => f.x != foundFood.x || f.y != foundFood.y);
             }
@@ -342,6 +345,28 @@ function snakeGame (canvas) {
 
     }
 
+    this.updateScore = function (val, food) {
+        document.getElementById("score").innerHTML = val;
+        switch (food.type) {
+            case FoodType.regular: 
+                $("#nred").html(++nRed)
+                break
+            case FoodType.moving: 
+                $("#nyellow").html(++nYellow)
+                break
+            case FoodType.disappear: 
+                $("#ngreen").html(++nGreen)
+                break
+        }
+    }
+    
+    this.resetScore = function (val) {
+        document.getElementById("score").innerHTML = val;
+        document.getElementById("nred").innerHTML = val;
+        document.getElementById("ngreen").innerHTML = val;
+        document.getElementById("nyellow").innerHTML = val;
+    }
+
     // setup event listeners
     window.addEventListener('keydown', this.onKeyDown);
     canvas.addEventListener('click', this.onMouseClicked);
@@ -352,20 +377,17 @@ function snakeGame (canvas) {
 
     // Init first food
     foods.push(this.placeFood());
+    this.resetScore(0);
 
     // Do the first update
     updateAll();
 }
 
 
-function updateScore(score) {
-    document.getElementById("score").innerHTML = score;
-}
 
 function startGame() {
     console.info("Start new game");
     var canvas = document.getElementById("canvas");
-    updateScore(0);
     snakeGame(canvas);
 }
 
@@ -374,4 +396,17 @@ document.onreadystatechange = function () {
         console.debug('document ready')
         startGame()
     }
+}
+
+
+function changeCSS(cssFile, cssLinkIndex) {
+
+    var oldlink = document.getElementsByTagName("link").item(cssLinkIndex);
+
+    var newlink = document.createElement("link");
+    newlink.setAttribute("rel", "stylesheet");
+    newlink.setAttribute("type", "text/css");
+    newlink.setAttribute("href", cssFile);
+
+    document.getElementsByTagName("head").item(0).replaceChild(newlink, oldlink);
 }

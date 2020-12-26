@@ -17,10 +17,33 @@
      margin-right: 2px;
      border-width: 1px;
      border-style: solid;
-     border-color: black;
+     border-color: gray;
      display: inline-block;
  }
 
  .speed-set {
-     background-color: black;
+     background-color: gray;
+ }
+
+ .dot {
+    height: 1em;
+    width: 1em;
+    border-radius: 50%;
+    display: inline-block
+ }
+.red {
+    background-color: red;
+ }
+.green {
+    background-color: green;
+ }
+.yellow {
+    background-color: yellow;
+ }
+
+ .footer-left{
+     text-align: left;
+ }
+ .footer-right{
+     text-align: right;
  }
