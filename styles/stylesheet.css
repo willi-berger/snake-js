@@ -21,9 +21,13 @@
      display: inline-block;
  }
 
- .speed-set {
+.speed-set {
      background-color: gray;
  }
+
+.speed-set-high {
+    background-color: red;
+}
 
  .dot {
     height: 1em;
@@ -46,4 +50,13 @@
  }
  .footer-right{
      text-align: right;
+}
+    
+.joystick {
+    text-align: center;
+    vertical-align: middle;
+ }
+
+ .joystick-button {
+    width: 90px;
  }

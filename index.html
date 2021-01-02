@@ -20,8 +20,7 @@
       </div>
     </div>
     <div class="row">
-      <div class="col-sm-12">
-
+      <div class="col-sm-12 col-md">
         <div>
           <p>
             Score:&nbsp;<span id="score">0</span>&nbsp;
@@ -50,24 +49,41 @@
             </div>
           </div>
         </div>
-        <div>
+      </div>
+      <div class="col-sm-12 col-md joystick">
 
-        </div>
-        <div>
-          <button name="start" onclick="startGame()">Start Game</button>
-        </div>
+          <div style>
+            <button name="ArrowUp" class="joystick-button">up</button>
+          </div>
+          <div >
+            <button name="ArrowLeft" class="joystick-button">left</button>
+            <button name="ArrowRight" class="joystick-button">right</button>
+          </div>
+          <div >
+            <button name="ArrowDown" class="joystick-button">down</button>
+          </div>
 
-        <footer>
-          <div class="footer-left">
-            <p>willie.b 2020</p>
-          </div>
-          <div class="footer-right">
-            <a href="#" onclick="changeCSS('node_modules/mini.css/dist/mini-default.min.css', 0);">light</a>&nbsp;
-            <a href="#" onclick="changeCSS('node_modules/mini.css/dist/mini-dark.min.css', 0);">dark</a>
-          </div>
-        </footer>
       </div>
     </div>
+    
+
+
+
+    <div class="row">
+      <div class="col-sm">
+        <button name="start" onclick="startGame()">Start Game</button>
+      </div>
+    </div>
+
+    <footer>
+      <div class="footer-left">
+        <p>willie.b 2020</p>
+      </div>
+      <div class="footer-right">
+        <a href="#" onclick="changeCSS('node_modules/mini.css/dist/mini-default.min.css', 0);">light</a>&nbsp;
+        <a href="#" onclick="changeCSS('node_modules/mini.css/dist/mini-dark.min.css', 0);">dark</a>
+      </div>
+    </footer>
   </div>
 
   <script src="node_modules/jquery/dist/jquery.min.js"></script>

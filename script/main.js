@@ -211,7 +211,7 @@ function snakeGame (canvas) {
     /**
      * updateAll: game main loop
      */
-    function updateAll() {
+    this.updateAll = function() {
         console.debug("update all")
         ctx.clearRect(0, 0, width, height);
         snake.canWalk();
@@ -269,18 +269,31 @@ function snakeGame (canvas) {
         let sVal = 11 - (timeStepMs/100);
         $("#speed").html(timeStepMs);
         for (i = 1; i <= 10; i++) {
+            let clazz = i < 8 ? 'speed-set' : 'speed-set-high';
             if (i <= sVal) {
-                $("#s"+(i-1)).addClass('speed-set')
+                $("#s"+(i-1)).addClass(clazz)
             } else {
-                $("#s"+(i-1)).removeClass('speed-set')
+                $("#s"+(i-1)).removeClass(clazz)
             }
         }
 
     }
 
     this.onKeyDown = function (e) {
-        //console.debug(`onKeyDown(${e.code}) `, this);
+        console.debug(`onKeyDown(${e.code}) `, this);
         switch (e.code) {
+            case 'ArrowUp':
+            case 'ArrowDown':
+            case 'ArrowLeft':
+            case 'ArrowRight':
+                this.handleMove(e.code)
+                break;
+        }
+    }
+
+    this.handleMove = function (direction) {
+        console.dir(this);
+        switch (direction) {
             case 'ArrowUp':
                 if (snake.dir == Direction.up) {
                     this.speedUp();
@@ -379,8 +392,15 @@ function snakeGame (canvas) {
     foods.push(this.placeFood());
     this.resetScore(0);
 
+    this.onJoystickClick = function(event) {
+        event.data.game.handleMove(event.target.name)
+    }
+    $(".joystick-button").on("click", {game: this}, this.onJoystickClick);
+
     // Do the first update
-    updateAll();
+    this.updateAll();
+
+    return this
 }
 
 
