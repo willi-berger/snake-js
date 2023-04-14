@@ -10,6 +10,8 @@ const FoodType = {
     disappear: {color: 'green', score:2}    // disappears, if eaten produces 3 red
 };
 
+var current_theme = 'light';
+
 function snakeGame (canvas) {
     const ctx = canvas.getContext('2d');
     const nRows = 15;
@@ -98,15 +100,17 @@ function snakeGame (canvas) {
         }
 
         this.stroke = function () {
-            //console.debug(`snake.stroke x: ${this.x}, y: ${this.y} - ${this.colorMode}`);             
+            console.debug(`snake.stroke x: ${this.x}, y: ${this.y} - ${this.colorMode}`);             
             let len = this.tail.length;
             let tail = this.tail;
             for (let i = 0; i < this.tail.length; i++) {
                 ctx.save();
                 ctx.translate(this.tail[i].x * cellWidth, this.tail[i].y * cellHeight);
-                ctx.fillStyle = this.colorMode ? 
-                    `rgb(${125*(i/(len-1))}, ${125*(i/(len-1))}, ${125*(i/(len-1))})` : 
+                let rgb = this.colorMode ? 
+                    `rgb(${255*(i/(len))}, 204, ${61*(i/(len))})` : 
                     `rgb(255, ${200*(i/(len-1))}, ${200*(i/(len-1))})`;
+                ctx.fillStyle = rgb;
+                console.log('fillStyle: ' + ctx.fillStyle + ' rgb: ' + rgb+ ' len: ' + len)
                 ctx.fillRect(offx, offy, w, h);
                 if (i > 0) {
                     //ctx.fillStyle = 'red'
@@ -212,7 +216,6 @@ function snakeGame (canvas) {
      * updateAll: game main loop
      */
     this.updateAll = function() {
-        console.debug("update all")
         ctx.clearRect(0, 0, width, height);
         snake.canWalk();
         let canWalk = snake.canWalk()
@@ -280,7 +283,7 @@ function snakeGame (canvas) {
     }
 
     this.onKeyDown = function (e) {
-        console.debug(`onKeyDown(${e.code}) `, this);
+        console.debug(`onKeyDown(${e.code})`);
         switch (e.code) {
             case 'ArrowUp':
             case 'ArrowDown':
@@ -419,8 +422,9 @@ document.onreadystatechange = function () {
 }
 
 
-function changeCSS(cssFile, cssLinkIndex) {
+function changeCSS(cssFile, cssLinkIndex, theme) {
 
+    current_theme = theme
     var oldlink = document.getElementsByTagName("link").item(cssLinkIndex);
 
     var newlink = document.createElement("link");
